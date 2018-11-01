@@ -1,8 +1,9 @@
-from Cryptodome.Cipher import AES
+from Crypto.Cipher import AES
 import bcrypt
 import getpass
+import os
 
-OUT_FILE = "token.dat"
+OUT_FILE = os.path.join("..", "..", "token.dat")
 
 print("Введіть Ваш ключ доступу з data.gov.ua: ")
 token = input() 
