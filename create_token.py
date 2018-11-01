@@ -2,11 +2,12 @@ from Crypto.Cipher import AES
 import bcrypt
 import getpass
 import os
+import re
 
 OUT_FILE = os.path.join("..", "..", "token.dat")
 
 print("Введіть Ваш ключ доступу з data.gov.ua: ")
-token = input() 
+token = input()
 password = getpass.getpass("Створіть пароль, аби зашифрувати файл: ")
 key = bcrypt.kdf(password = password.encode(), salt = b"salt", desired_key_bytes = 32, rounds = 100)
 cipher = AES.new(key, AES.MODE_EAX)

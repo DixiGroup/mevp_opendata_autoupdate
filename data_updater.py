@@ -12,12 +12,12 @@ import requests
 DATASET_TEMPLATE = "https://data.gov.ua/api/3/action/package_show?id={id:s}"
 UPDATE_TEMPLATE = ""
 YEAR_RE = re.compile("\d{4}")
-UPDATE_FOLDER = os.path.join("..", "..", "OPENDATA_UPDATE")
+UPDATE_FOLDER = os.path.join("..", "OPENDATA_UPDATE")
 NUMBER_RE = re.compile("\d+")
 PERIOD_RE = re.compile("[qm]?\d+[qm]?[_\.]")
 RE_PART = "(_.?\d+.*)+[_\.]"
-TOKEN_FILE = os.path.join("..", "..", "token.dat")
-DATASETS_FILE = os.path.join("..", "..", "datasets.json")
+TOKEN_FILE = os.path.join("..", "token.dat")
+DATASETS_FILE = os.path.join("..", "datasets.json")
 
 
 def to_monthes(s):
@@ -68,7 +68,8 @@ def newest_file(files):
 def upload_update(resource_id, file_):
     print("Файл",file_, "вантажиться...")
     files = [('upload', open(file_, "rb"))]
-    r = requests.post(url = "https://data.gov.ua/api/action/resource_update", data = {"id": resource_id}, headers = {"Authorization": token}, files = files)
+    r = requests.post(url = "https://data.gov.ua/api/action/resource_update", data = {"id": resource_id}, headers = {"Authorization": token}, 
+                      files = files, cookies = {})
 
 password = getpass.getpass("Введіть пароль до файла з ключем: ")
 key = bcrypt.kdf(password = password.encode(), salt = b"salt", desired_key_bytes = 32, rounds = 100)
@@ -91,7 +92,7 @@ resources_data = {}
 for d in datasets_ids:
     sleep(1)
     resources_data[d] = {}
-    dataset_info = requests.get(DATASET_TEMPLATE.format(id = d), headers = {"Authorization":token}).json()
+    dataset_info = requests.get(DATASET_TEMPLATE.format(id = d), headers = {"Authorization":token}, cookies = {}).json()
     resources = dataset_info['result']['resources']
     for r in resources:
         f = r['url'].split('/')[-1]
@@ -113,3 +114,6 @@ for d in datasets_ids:
             if len(updates) > 0:
                 to_upload = update_files[newest_file(updates)]
                 upload_update(r['id'], to_upload)
+
+print("Оновлено все, що можна було оновити")
+sleep(10)
